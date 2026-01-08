@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NestJS Clean Architecture Pattern Documentation</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 28px;
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        opacity: 0.9;
+        font-size: 14px;
+      }
+
+      .tabs {
+        display: flex;
+        background: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+        overflow-x: auto;
+      }
+
+      .tab {
+        padding: 15px 25px;
+        cursor: pointer;
+        border: none;
+        background: none;
+        font-size: 14px;
+        font-weight: 600;
+        color: #6c757d;
+        transition: all 0.3s;
+        white-space: nowrap;
+      }
+
+      .tab:hover {
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+      }
+
+      .tab.active {
+        color: #667eea;
+        border-bottom: 3px solid #667eea;
+        background: white;
+      }
+
+      .content {
+        padding: 30px;
+      }
+
+      .sheet {
+        display: none;
+        animation: fadeIn 0.3s;
+      }
+
+      .sheet.active {
+        display: block;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        font-size: 13px;
+      }
+
+      th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px 10px;
+        text-align: left;
+        font-weight: 600;
+        position: sticky;
+        top: 0;
+      }
+
+      td {
+        padding: 10px;
+        border-bottom: 1px solid #dee2e6;
+        vertical-align: top;
+      }
+
+      tr:hover {
+        background: #f8f9fa;
+      }
+
+      .section-title {
+        font-size: 20px;
+        color: #667eea;
+        margin-bottom: 15px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .badge-domain {
+        background: #e3f2fd;
+        color: #1976d2;
+      }
+      .badge-application {
+        background: #f3e5f5;
+        color: #7b1fa2;
+      }
+      .badge-infrastructure {
+        background: #fff3e0;
+        color: #e65100;
+      }
+      .badge-presentation {
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
+
+      code {
+        background: #f8f9fa;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: "Courier New", monospace;
+        font-size: 12px;
+        color: #d63384;
+      }
+
+      .example-box {
+        background: #f8f9fa;
+        border-left: 4px solid #667eea;
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 4px;
+      }
+
+      .flow-diagram {
+        background: white;
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .flow-step {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 5px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 6px;
+        font-weight: 600;
+      }
+
+      .arrow {
+        display: inline-block;
+        margin: 0 10px;
+        color: #667eea;
+        font-size: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🏗️ NestJS Clean Architecture Pattern</h1>
+        <p>
+          Complete documentation for implementing Clean Architecture in NestJS
+          projects
+        </p>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="showSheet('overview')">
+          📋 Overview
+        </button>
+        <button class="tab" onclick="showSheet('domain')">
+          🎯 Domain Layer
+        </button>
+        <button class="tab" onclick="showSheet('application')">
+          ⚙️ Application Layer
+        </button>
+        <button class="tab" onclick="showSheet('infrastructure')">
+          🔧 Infrastructure Layer
+        </button>
+        <button class="tab" onclick="showSheet('presentation')">
+          🌐 Presentation Layer
+        </button>
+        <button class="tab" onclick="showSheet('flow')">
+          🔄 Complete Flow
+        </button>
+        <button class="tab" onclick="showSheet('example')">
+          💡 Full Example
+        </button>
+      </div>
+
+      <div class="content">
+        <!-- Overview Sheet -->
+        <div id="overview" class="sheet active">
+          <div class="section-title">📋 Clean Architecture Overview</div>
+
+          <div class="flow-diagram">
+            <div class="flow-step">1. Domain</div>
+            <span class="arrow">→</span>
+            <div class="flow-step">2. Application</div>
+            <span class="arrow">→</span>
+            <div class="flow-step">3. Infrastructure</div>
+            <span class="arrow">→</span>
+            <div class="flow-step">4. Presentation</div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 15%">Layer</th>
+                <th style="width: 20%">Order</th>
+                <th style="width: 35%">Purpose</th>
+                <th style="width: 30%">Key Components</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="badge badge-domain">Domain</span></td>
+                <td><strong>Step 1 - Start Here</strong></td>
+                <td>Business entities and rules. No external dependencies.</td>
+                <td>
+                  Entities, Value Objects, Repository Interfaces, Domain
+                  Exceptions
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="badge badge-application">Application</span>
+                </td>
+                <td><strong>Step 2</strong></td>
+                <td>Use cases and business logic orchestration</td>
+                <td>Use Cases, DTOs, Application Services, Ports</td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="badge badge-infrastructure">Infrastructure</span>
+                </td>
+                <td><strong>Step 3</strong></td>
+                <td>Technical implementation details</td>
+                <td>
+                  Repository Implementations, ORM Entities, Database Config,
+                  External APIs
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="badge badge-presentation">Presentation</span>
+                </td>
+                <td><strong>Step 4 - End Here</strong></td>
+                <td>API layer and HTTP handling</td>
+                <td>
+                  Controllers, Request/Response DTOs, Validation, HTTP Mapping
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="example-box">
+            <strong>🎯 Starting Point:</strong> Since you have your database
+            schema, start from <strong>Domain Layer</strong> by modeling your
+            business entities based on your database tables.
+          </div>
+        </div>
+
+        <!-- Domain Layer Sheet -->
+        <div id="domain" class="sheet">
+          <div class="section-title">
+            🎯 Domain Layer <span class="badge badge-domain">Step 1</span>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 20%">Component</th>
+                <th style="width: 30%">Location</th>
+                <th style="width: 50%">Description & Code Pattern</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Entity</strong></td>
+                <td><code>src/domain/{entity}/entities/</code></td>
+                <td>
+                  Business model with methods and validation
+                  <pre
+                    style="
+                      background: #282c34;
+                      color: #abb2bf;
+                      padding: 10px;
+                      border-radius: 4px;
+                      margin-top: 10px;
+                      overflow-x: auto;
+                    "
+                  >
+export class User {
+  constructor(
+    public readonly id: string,
+    public email: string,
+    public name: string,
+  ) {}
+  
+  updateEmail(email: string) {
+    // Business logic here
+    this.email = email;
+  }
+}</pre
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Repository Interface</strong></td>
+                <td><code>src/domain/{entity}/repositories/</code></td>
+                <td>
+                  Contract for data access (interface only)
+                  <pre
+                    style="
+                      background: #282c34;
+                      color: #abb2bf;
+                      padding: 10px;
+                      border-radius: 4px;
+                      margin-top: 10px;
+                      overflow-x: auto;
+                    "
+                  >
+export interface UserRepository {
+  findById(id: string): Promise&lt;User&gt;;
+  save(user: User): Promise&lt;User&gt;;
+  delete(id: string): Promise&lt;void&gt;;
+}</pre
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Value Objects</strong></td>
+                <td><code>src/domain/{entity}/value-objects/</code></td>
+                <td>
+                  Immutable objects for domain concepts
+                  <pre
+                    style="
+                      background: #282c34;
+                      color: #abb2bf;
+                      padding: 10px;
+                      border-radius: 4px;
+                      margin-top: 10px;
+                      overflow-x: auto;
+                    "
+                  >
+export class Email {
+  constructor(private readonly value: string) {
+    if (!this.isValid(value)) {
+      throw new Error('Invalid email');
+    }
+  }
+  
+  private isValid(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+}</pre
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Domain Exceptions</strong></td>
+                <td><code>src/domain/{entity}/exceptions/</code></td>
+                <td>
+                  Business rule violations
+                  <pre
+                    style="
+                      background: #282c34;
+                      color: #abb2bf;
+                      padding: 10px;
+                      border-radius: 4px;
+                      margin-top: 10px;
+                      overflow-x: auto;
+                    "
+                  >
+export class UserNotFoundException 
+  extends Error {
+  constructor(id: string) {
+    super(`User ${id} not found`);
+  }
+}</pre
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Application Layer Sheet -->
+        <div id="application" class="sheet">
+          <div class="section-title">
+            ⚙️ Application Layer
+            <span class="badge badge-application">Step 2</span>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 20%">Component</th>
+                <th style="width: 30%">Location</th>
+                <th style="width: 50%">Description & Code Pattern</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Use Case / Service</strong></td>
+                <td><code>src/application/{entity}/use-cases/</code></td>
+                <td>
+                  Business logic orchestration
+                  <pre
+                    style="
+                      background: #282c34;
+                      color: #abb2bf;
+                      padding: 10px;
+                      border-radius: 4px;
+                      margin-top: 10px;
+                      overflow-x: auto;
+                    "
+                  >
+@Injectable()
+export class CreateUserUseCase {
+  constructor(
+    @Inject('UserRepository')
+    private userRepo: UserRepository
+  ) {}
+  
+  async execute(dto: CreateUserDto) {
+    const user = new User(
+      uuidv4(),
+      dto.email,
+      dto.name
+    );
+    return await this.userRepo.save(user);
+  }
+}</pre
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Input DTO</strong></td>
+                <td><code>src/application/{entity}/dto/</code></td>
+                <td>
+                  Data structure for use case input
+                  <pre
+                    style="
+                      background: #282c34;
+                      color: #abb2bf;
+                      padding: 10px;
+                      border-radius: 4px;
+                      margin-top: 10px;
+                      overflow-x: auto;
+                    "
+                  >
+export class CreateUserDto {
+  email: string;
+  name: string;
+  password: string;
+}</pre
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Output DTO</strong></td>
+                <td><code>src/application/{entity}/dto/</code></td>
+                <td>
+                  Data structure for use case response
+                  <pre
+                    style="
+                      background: #282c34;
+                      color: #abb2bf;
+                      padding: 10px;
+                      border-radius: 4px;
+                      margin-top: 10px;
+                      overflow-x: auto;
+                    "
+                  >
+export class UserResponseDto {
+  id: string;
+  email: string;
+  name: string;
+  createdAt: Date;
+}</pre
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Mapper</strong></td>
+                <td><code>src/application/{entity}/mappers/</code></td>
+                <td>
+                  Convert between domain and DTOs
+                  <pre
+                    style="
+                      background: #282c34;
+                      color: #abb2bf;
+                      padding: 10px;
+                      border-radius: 4px;
+                      margin-top: 10px;
+                      overflow-x: auto;
+                    "
+                  >
+export class UserMapper {
+  static toDto(user: User): UserResponseDto {
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      createdAt: user.createdAt
+    };
+  }
+}</pre
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Infrastructure Layer Sheet -->
+        <div id="infrastructure" class="sheet">
+          <div class="section-title">
+            🔧 Infrastructure Layer
+            <span class="badge badge-infrastructure">Step 3</span>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 20%">Component</th>
+                <th style="width: 30%">Location</th>
+                <th style="width: 50%">Description & Code Pattern</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>ORM Entity</strong></td>
+                <td><code>src/infrastructure/persistence/{entity}/</code></td>
+                <td>
+                  Database schema mapping
+                  <pre
+                    style="
+                      background: #282c34;
+                      color: #abb2bf;
+                      padding: 10px;
+                      border-radius: 4px;
+                      margin-top: 10px;
+                      overflow-x: auto;
+                    "
+                  >
+@Entity('users')
+export class UserSchema {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+  
+  @Column()
+  email: string;
+  
+  @Column()
+  name: string;
+  
+  @CreateDateColumn()
+  createdAt: Date;
+}</pre
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Repository Implementation</strong></td>
+                <td><code>src/infrastructure/persistence/{entity}/</code></td>
+                <td>
+                  Concrete implementation of domain repository
+                  <pre
+                    style="
+                      background: #282c34;
+                      color: #abb2bf;
+                      padding: 10px;
+                      border-radius: 4px;
+                      margin-top: 10px;
+                      overflow-x: auto;
+                    "
+                  >
+@Injectable()
+export class TypeOrmUserRepository 
+  implements UserRepository {
+  
+  constructor(
+    @InjectRepository(UserSchema)
+    private repo: Repository&lt;UserSchema&gt;
+  ) {}
+  
+  async findById(id: string): Promise&lt;User&gt; {
+    const schema = await this.repo.findOne({
+      where: { id }
+    });
+    return this.toDomain(schema);
+  }
+  
+  private toDomain(schema: UserSchema): User {
+    return new User(
+      schema.id,
+      schema.email,
+      schema.name
+    );
+  }
+}</pre
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Database Module</strong></td>
+                <td><code>src/infrastructure/persistence/</code></td>
+                <td>
+                  Database configuration
+                  <pre
+                    style="
+                      background: #282c34;
+                      color: #abb2bf;
+                      padding: 10px;
+                      border-radius: 4px;
+                      margin-top: 10px;
+                      overflow-x: auto;
+                    "
+                  >
+@Module({
+  imports: [
+    TypeOrmModule.forFeature([UserSchema])
+  ],
+  providers: [
+    {
+      provide: 'UserRepository',
+      useClass: TypeOrmUserRepository
+    }
+  ],
+  exports: ['UserRepository']
+})
+export class UserPersistenceModule {}</pre
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Presentation Layer Sheet -->
+        <div id="presentation" class="sheet">
+          <div class="section-title">
+            🌐 Presentation Layer
+            <span class="badge badge-presentation">Step 4</span>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 20%">Component</th>
+                <th style="width: 30%">Location</th>
+                <th style="width: 50%">Description & Code Pattern</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Controller</strong></td>
+                <td><code>src/presentation/{entity}/</code></td>
+                <td>
+                  HTTP endpoint handlers
+                  <pre
+                    style="
+                      background: #282c34;
+                      color: #abb2bf;
+                      padding: 10px;
+                      border-radius: 4px;
+                      margin-top: 10px;
+                      overflow-x: auto;
+                    "
+                  >
+@Controller('users')
+export class UserController {
+  constructor(
+    private createUser: CreateUserUseCase,
+    private getUser: GetUserUseCase
+  ) {}
+  
+  @Post()
+  async create(@Body() dto: CreateUserRequestDto) {
+    const result = await this.createUser.execute(dto);
+    return UserMapper.toDto(result);
+  }
+  
+  @Get(':id')
+  async getById(@Param('id') id: string) {
+    const user = await this.getUser.execute(id);
+    return UserMapper.toDto(user);
+  }
+}</pre
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Request DTO</strong></td>
+                <td><code>src/presentation/{entity}/dto/</code></td>
+                <td>
+                  HTTP request validation
+                  <pre
+                    style="
+                      background: #282c34;
+                      color: #abb2bf;
+                      padding: 10px;
+                      border-radius: 4px;
+                      margin-top: 10px;
+                      overflow-x: auto;
+                    "
+                  >
+export class CreateUserRequestDto {
+  @IsEmail()
+  email: string;
+  
+  @IsString()
+  @MinLength(3)
+  name: string;
+  
+  @IsString()
+  @MinLength(8)
+  password: string;
+}</pre
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Response DTO</strong></td>
+                <td><code>src/presentation/{entity}/dto/</code></td>
+                <td>
+                  HTTP response structure (can reuse Application DTOs)
+                  <pre
+                    style="
+                      background: #282c34;
+                      color: #abb2bf;
+                      padding: 10px;
+                      border-radius: 4px;
+                      margin-top: 10px;
+                      overflow-x: auto;
+                    "
+                  >
+export class UserResponseDto {
+  id: string;
+  email: string;
+  name: string;
+  createdAt: string;
+}</pre
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Module</strong></td>
+                <td><code>src/presentation/{entity}/</code></td>
+                <td>
+                  Wire everything together
+                  <pre
+                    style="
+                      background: #282c34;
+                      color: #abb2bf;
+                      padding: 10px;
+                      border-radius: 4px;
+                      margin-top: 10px;
+                      overflow-x: auto;
+                    "
+                  >
+@Module({
+  imports: [UserPersistenceModule],
+  controllers: [UserController],
+  providers: [
+    CreateUserUseCase,
+    GetUserUseCase
+  ]
+})
+export class UserModule {}</pre
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Flow Sheet -->
+        <div id="flow" class="sheet">
+          <div class="section-title">🔄 Complete Development Flow</div>
+
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 10%">Step</th>
+                <th style="width: 20%">Action</th>
+                <th style="width: 35%">What to Create</th>
+                <th style="width: 35%">Dependencies</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="badge badge-domain">1</span></td>
+                <td><strong>Define Domain</strong></td>
+                <td>
+                  Create Entity, Repository Interface, Value Objects, Exceptions
+                </td>
+                <td>None - Start here!</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-application">2</span></td>
+                <td><strong>Create Use Cases</strong></td>
+                <td>Use Case classes, Input/Output DTOs, Mappers</td>
+                <td>Depends on: Domain Entity, Repository Interface</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-infrastructure">3</span></td>
+                <td><strong>Implement Infrastructure</strong></td>
+                <td>ORM Entity, Repository Implementation, Database Module</td>
+                <td>Depends on: Repository Interface from Domain</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-presentation">4</span></td>
+                <td><strong>Create API</strong></td>
+                <td>Controller, Request/Response DTOs, Module</td>
+                <td>Depends on: Use Cases, Mappers</td>
+              </tr>
+              <tr>
+                <td><strong>5</strong></td>
+                <td><strong>Wire Dependencies</strong></td>
+                <td>Register providers in modules, inject dependencies</td>
+                <td>All layers ready</td>
+              </tr>
+              <tr>
+                <td><strong>6</strong></td>
+                <td><strong>Test</strong></td>
+                <td>Unit tests for each layer, Integration tests for API</td>
+                <td>Everything implemented</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="example-box">
+            <strong>💡 Pro Tip:</strong> Always work from inner layers (Domain)
+            to outer layers (Presentation). This ensures your business logic is
+            independent of technical details.
+          </div>
+        </div>
+
+        <!-- Example Sheet -->
+        <div id="example" class="sheet">
+          <div class="section-title">💡 Complete User API Example</div>
+
+          <h3 style="color: #667eea; margin-top: 20px">📁 Folder Structure</h3>
+          <pre
+            style="
+              background: #282c34;
+              color: #abb2bf;
+              padding: 15px;
+              border-radius: 4px;
+              overflow-x: auto;
+            "
+          >
+src/
+├── domain/
+│   └── user/
+│       ├── entities/
+│       │   └── user.entity.ts
+│       ├── repositories/
+│       │   └── user.repository.ts
+│       └── exceptions/
+│           └── user-not-found.exception.ts
+│
+├── application/
+│   └── user/
+│       ├── dto/
+│       │   ├── create-user.dto.ts
+│       │   └── user-response.dto.ts
+│       ├── use-cases/
+│       │   ├── create-user.use-case.ts
+│       │   └── get-user.use-case.ts
+│       └── mappers/
+│           └── user.mapper.ts
+│
+├── infrastructure/
+│   └── persistence/
+│       └── user/
+│           ├── schemas/
+│           │   └── user.schema.ts
+│           ├── repositories/
+│           │   └── typeorm-user.repository.ts
+│           └── user-persistence.module.ts
+│
+└── presentation/
+    └── user/
+        ├── controllers/
+        │   └── user.controller.ts
+        ├── dto/
+        │   └── create-user-request.dto.ts
+        └── user.module.ts</pre
+          >
+
+          <h3 style="color: #667eea; margin-top: 30px">
+            🔄 Request Flow Example
+          </h3>
+          <div
+            style="
+              background: #f8f9fa;
+              padding: 20px;
+              border-radius: 8px;
+              margin: 20px 0;
+            "
+          >
+            <strong>POST /users</strong> with body:
+            <code>{ "email": "john@example.com", "name": "John" }</code>
+            <br /><br />
+            <ol style="line-height: 2">
+              <li>
+                <strong>Controller</strong> receives request → validates
+                <code>CreateUserRequestDto</code>
+              </li>
+              <li>
+                <strong>Controller</strong> calls
+                <code>CreateUserUseCase.execute(dto)</code>
+              </li>
+              <li>
+                <strong>Use Case</strong> creates domain
+                <code>User</code> entity
+              </li>
+              <li>
+                <strong>Use Case</strong> calls
+                <code>UserRepository.save(user)</code>
+              </li>
+              <li>
+                <strong>Repository</strong> converts to
+                <code>UserSchema</code> and saves to database
+              </li>
+              <li>
+                <strong>Repository</strong> returns domain <code>User</code>
+              </li>
+              <li>
+                <strong>Controller</strong> uses
+                <code>UserMapper.toDto(user)</code>
+              </li>
+              <li>
+                <strong>Controller</strong> returns
+                <code>UserResponseDto</code> to client
+              </li>
+            </ol>
+          </div>
+
+          <h3 style="color: #667eea; margin-top: 30px">
+            📋 Checklist for Each Entity
+          </h3>
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 30%">Component</th>
+                <th style="width: 50%">Files to Create</th>
+                <th style="width: 20%">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="badge badge-domain">Domain</span></td>
+                <td>entity.ts, repository.interface.ts, exceptions.ts</td>
+                <td>☐ To Do</td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="badge badge-application">Application</span>
+                </td>
+                <td>use-case.ts, dto.ts, mapper.ts</td>
+                <td>☐ To Do</td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="badge badge-infrastructure">Infrastructure</span>
+                </td>
+                <td>schema.ts, repository.impl.ts, module.ts</td>
+                <td>☐ To Do</td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="badge badge-presentation">Presentation</span>
+                </td>
+                <td>controller.ts, request-dto.ts, module.ts</td>
+                <td>☐ To Do</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function showSheet(sheetId) {
+        // Hide all sheets
+        const sheets = document.querySelectorAll(".sheet");
+        sheets.forEach((sheet) => sheet.classList.remove("active"));
+
+        // Remove active class from all tabs
+        const tabs = document.querySelectorAll(".tab");
+        tabs.forEach((tab) => tab.classList.remove("active"));
+
+        // Show selected sheet
+        document.getElementById(sheetId).classList.add("active");
+
+        // Add active class to clicked tab
+        event.target.classList.add("active");
+      }
+    </script>
+  </body>
+</html>
